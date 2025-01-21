@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"> 
+    <title>油溝計算</title>
+    <link rel="stylesheet" href="ui.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>放射狀油溝計算</h1>
+    <p class="section-title">輸入座標：</p>
+    <div class="form-group">
+        <label for="ball_diameter">球碗直徑：</label>
+        <input type="number" id="ball_diameter" placeholder="238" value="238">
+    </div>
+    <div class="form-group">
+        <label for="oil_radius">油溝半徑：</label>
+        <input type="number" id="oil_radius" placeholder="124" value="124">
+    </div>
+    <div class="form-group">
+        <label for="center">球碗圓心：</label>
+        <input type="number" id="center" placeholder="50" value="50">
+    </div>
+    <div class="form-group">
+        <label for="oil_finish">第二油溝：</label>
+        <input type="number" id="oil_finish" placeholder="50" value="50">
+    </div>
+    <div class="form-group">
+        <label for="code_starting">程式起點：</label>
+        <input type="number" id="code_starting" placeholder="5" value="5">
+    </div>    
+    <div class="form-group">
+        <label for="tools_radius">刀具半徑：</label>
+        <input type="number" id="tools_radius" placeholder="5" value="5">
+    </div>
+    <div class="button-row">
+        <button onclick="calculate()">計算座標</button>
+    </div>
+    <div id="test">結果：--</div>
+    <div id="draw">圖表：</div>
+    <div style="width: 700px; height: 700px;">
+        <canvas id="coordinateChart"></canvas>
+    </div>
+    <script>
+        function calculate() {
+            const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
+            const oil_radius = parseFloat(document.getElementById('oil_radius').value);
+            const center = parseFloat(document.getElementById('center').value);
+            const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
+            const code_starting = parseFloat(document.getElementById('code_starting').value);
+            const tool = parseFloat(document.getElementById('tools_radius').value);
+            
+            if (!isNaN(ball_diameter) && !isNaN(oil_radius) && !isNaN(center) && !isNaN(oil_finish)) {
+                let oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
+                let oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
+                let code_starting_y = Math.sqrt((oil_radius - tool) ** 2 - (oil_center - tool - code_starting) ** 2);
+                let code_finish_z = -(oil_finish + tool);
+                let code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
+
+                document.getElementById('test').innerHTML = `
+                    結果：<br>
+                    oil_finish_y: ${oil_finish_y.toFixed(2)}<br>
+                    oil_center: ${oil_center.toFixed(2)}<br>
+                    程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
+                    程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
+                `;
+                drawChart();
+            }
+        }
+
+        function drawChart() {
+            const ctx = document.getElementById('coordinateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '基準線',
+                        data: [],
+                        pointRadius: 0,
+                        borderColor: 'gray',
+                        borderWidth: 1,
+                        showLine: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false,
+                                color: (context) => (context.tick.value === 0 ? 'red' : 'rgba(0, 0, 0, 0.1)')
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false,
+                                color: (context) => (context.tick.value === 0 ? 'red' : 'rgba(0, 0, 0, 0.1)')
+                            }
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    xMin: 0,
+                                    xMax: 0,
+                                    borderColor: 'red',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5]
+                                },
+                                line2: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: 'red',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5]
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
