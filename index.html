@@ -75,6 +75,17 @@
                             showLine: true,
                             pointRadius: 0.5,
                         },
+                    
+                        {
+                            label: '油溝終點', // 新增標記點
+                            data: [],  // 替換為你的標記座標
+                            backgroundColor: 'rgba(0, 0, 255, 1)', // 深藍色
+                            borderColor: 'rgba(0, 0, 255, 1)',
+                            borderWidth: 2,
+                            pointRadius: 4,  // 設置標記點的大小
+                            pointStyle: 'circle', // 使用圓形標記
+                        }
+                    
                     ],
                 },
                 options: {
@@ -194,9 +205,13 @@
                     const arcZ = (oil_radius) * Math.cos(angle);  // 加上圓心偏移量
                     oil_arcPoints.push({ x: arcX, y: arcZ });
                 }
+                const oil_finish_point = []; // 確保它是陣列
+                oil_finish_point.push({ x: -oil_finish, y: oil_finish_y });
+
 
                 chart.data.datasets[0].data = arcPoints; // 更新圓弧計算結果
                 chart.data.datasets[1].data = oil_arcPoints; // 更新油溝圓弧計算結果
+                chart.data.datasets[2].data = oil_finish_point;
                 chart.update();
 
                 // 更新圖表範圍
@@ -213,7 +228,7 @@
                 `;
 
                 // 更新圖表
-                updateChart(arcPoints, oil_arcPoints);
+                updateChart(arcPoints, oil_arcPoints, oil_finish_point);
                 
 
             }
