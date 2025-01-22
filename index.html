@@ -35,6 +35,10 @@
         <label for="tools_radius">刀具半徑：</label>
         <input type="number" id="tools_radius" placeholder="5" value="5">
     </div>
+    <div class="form-group">
+        <label for="under_diameter">碗底直徑：</label>
+        <input type="number" id="under_diameter" placeholder="20" value="20">
+    </div>
     <div class="button-row">
         <button onclick="calculate()">計算座標</button>
     </div>
@@ -46,9 +50,10 @@
 
     <script>
         let chart = null;
-
         function initializeChart() {
             const ctx = document.getElementById('coordinateChart').getContext('2d');
+            const code_starting = parseFloat(document.getElementById('code_starting').value) || 0;
+            const under_diameter = parseFloat(document.getElementById('under_diameter').value) || 0;
             chart = new Chart(ctx, {
                 type: 'scatter',
                 data: {
@@ -141,7 +146,7 @@
                                     type: 'line',
                                     mode: 'vertical',
                                     scaleID: 'x',
-                                    value: 5,
+                                    value: code_starting,
                                     borderColor: 'red',
                                     borderWidth: 1,
                                     borderDash: [5, 5],  // 虛線
@@ -149,6 +154,18 @@
                                         enabled: false,
                                     },
                                 },
+                                {
+                                    type: 'line',
+                                    mode: 'horizontal',
+                                    scaleID: 'y',
+                                    value: under_diameter / 2 ,
+                                    borderColor: 'green',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5],  // 虛線
+                                    label: {
+                                        enabled: false,
+                                },
+                            },
                             ],
                         },
                     },
@@ -163,6 +180,7 @@
             const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
             const code_starting = parseFloat(document.getElementById('code_starting').value);
             const tool = parseFloat(document.getElementById('tools_radius').value);
+            const under_diameter = parseFloat(document.getElementById('under_diameter').value);
 
             if (!isNaN(ball_diameter) && !isNaN(oil_radius) && !isNaN(center) && !isNaN(oil_finish)) {
                 const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
@@ -212,6 +230,9 @@
                 chart.data.datasets[0].data = arcPoints; // 更新圓弧計算結果
                 chart.data.datasets[1].data = oil_arcPoints; // 更新油溝圓弧計算結果
                 chart.data.datasets[2].data = oil_finish_point;
+                // 更新圖表的虛線
+                chart.options.plugins.annotation.annotations[2].value = code_starting; // 紅色線
+                chart.options.plugins.annotation.annotations[3].value = under_diameter / 2 ; // 綠色線
                 chart.update();
 
                 // 更新圖表範圍
