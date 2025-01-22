@@ -62,7 +62,7 @@
                             fill: false,
                             lineTension: 0,
                             showLine: true,
-                            pointRadius: 1,
+                            pointRadius: 0.5,
                         },
                         {
                             label: '油溝',
@@ -73,7 +73,7 @@
                             fill: false,
                             lineTension: 0,
                             showLine: true,
-                            pointRadius: 1,
+                            pointRadius: 0.5,
                         },
                     ],
                 },
@@ -175,7 +175,7 @@
                 // 使用 r 來繪製圓弧
                 const arcPoints = [];
                 const oil_arcPoints = [];
-                const numPoints = 100; // 點的數量
+                const numPoints = 300; // 點的數量
                 const angleStep = (startAngle - endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
                 const oil_angleStep = (oil_startAngle - oil_endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
 
