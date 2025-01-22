@@ -47,131 +47,198 @@
     <div style="width: 400px; height: 400px;">
         <canvas id="coordinateChart"></canvas>
     </div>
+    <div class="form-group">
+        <input type="range" id="mySlider" value="50">
+        <p>當前值: <span id="sliderValue">50</span></p>
+    </div>
 
     <script>
-        let chart = null;
-        function initializeChart() {
-            const ctx = document.getElementById('coordinateChart').getContext('2d');
-            const code_starting = parseFloat(document.getElementById('code_starting').value) || 0;
-            const under_diameter = parseFloat(document.getElementById('under_diameter').value) || 0;
-            chart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [
-                        {
-                            label: '球碗',
-                            data: [],
-                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 2,
-                            fill: false,
-                            lineTension: 0,
-                            showLine: true,
-                            pointRadius: 0.5,
-                        },
-                        {
-                            label: '油溝',
-                            data: [],
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2,
-                            fill: false,
-                            lineTension: 0,
-                            showLine: true,
-                            pointRadius: 0.5,
-                        },
-                    
-                        {
-                            label: '油溝終點', // 新增標記點
-                            data: [],  // 替換為你的標記座標
-                            backgroundColor: 'rgba(0, 0, 255, 1)', // 深藍色
-                            borderColor: 'rgba(0, 0, 255, 1)',
-                            borderWidth: 2,
-                            pointRadius: 4,  // 設置標記點的大小
-                            pointStyle: 'circle', // 使用圓形標記
-                        }
-                    
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            position: 'bottom',
-                            min: -100, 
-                            max: 100,
-                            ticks: {
-                                stepSize: 10,
-                            },
-                        },
-                        y: {
-                            type: 'linear',
-                            min: 0, 
-                            max: 100,
-                            ticks: {
-                                stepSize: 10,
-                            },
+     let chart = null;
+
+    // 初始化圖表
+    function initializeChart() {
+        const ctx = document.getElementById('coordinateChart').getContext('2d');
+        const code_starting = parseFloat(document.getElementById('code_starting').value) || 0;
+        const under_diameter = parseFloat(document.getElementById('under_diameter').value) || 0;
+
+        chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: '球碗',
+                        data: [],
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        lineTension: 0,
+                        showLine: true,
+                        pointRadius: 0.5,
+                    },
+                    {
+                        label: '油溝',
+                        data: [],
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        lineTension: 0,
+                        showLine: true,
+                        pointRadius: 0.5,
+                    },
+                    {
+                        label: '油溝終點', 
+                        data: [],
+                        backgroundColor: 'rgba(0, 0, 255, 1)', 
+                        borderColor: 'rgba(0, 0, 255, 1)',
+                        borderWidth: 2,
+                        pointRadius: 4,  
+                        pointStyle: 'circle', 
+                    },
+                    {
+                        label: '刀具', 
+                        data: [],
+                        backgroundColor: 'rgba(0, 0, 255, 1)', 
+                        borderColor: 'rgba(0, 0, 255, 1)',
+                        borderWidth: 2,
+                        pointRadius: 4,  
+                        pointStyle: 'circle', 
+                    }
+
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: -100, 
+                        max: 100,
+                        ticks: {
+                            stepSize: 10,
                         },
                     },
-                    aspectRatio: 1,
-                    plugins: {
-                        annotation: {
-                            annotations: [
-                                {
-                                    type: 'line',
-                                    mode: 'horizontal',
-                                    scaleID: 'y',
-                                    value: 0,
-                                    borderColor: 'black',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5],  // 虛線
-                                    label: {
-                                        enabled: false,
-                                    },
-                                },
-                                {
-                                    type: 'line',
-                                    mode: 'vertical',
-                                    scaleID: 'x',
-                                    value: 0,
-                                    borderColor: 'black',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5],  // 虛線
-                                    label: {
-                                        enabled: false,
-                                    },
-                                },
-                                {
-                                    type: 'line',
-                                    mode: 'vertical',
-                                    scaleID: 'x',
-                                    value: code_starting,
-                                    borderColor: 'red',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5],  // 虛線
-                                    label: {
-                                        enabled: false,
-                                    },
-                                },
-                                {
-                                    type: 'line',
-                                    mode: 'horizontal',
-                                    scaleID: 'y',
-                                    value: under_diameter / 2 ,
-                                    borderColor: 'green',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5],  // 虛線
-                                    label: {
-                                        enabled: false,
-                                },
-                            },
-                            ],
+                    y: {
+                        type: 'linear',
+                        min: 0, 
+                        max: 100,
+                        ticks: {
+                            stepSize: 10,
                         },
                     },
                 },
-            });
-        }
+                aspectRatio: 1,
+                plugins: {
+                    annotation: {
+                        annotations: [
+                            {
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y',
+                                value: 0,
+                                borderColor: 'black',
+                                borderWidth: 1,
+                                borderDash: [5, 5],  
+                                label: {
+                                    enabled: false,
+                                },
+                            },
+                            {
+                                type: 'line',
+                                mode: 'vertical',
+                                scaleID: 'x',
+                                value: 0,
+                                borderColor: 'black',
+                                borderWidth: 1,
+                                borderDash: [5, 5],  
+                                label: {
+                                    enabled: false,
+                                },
+                            },
+                            {
+                                type: 'line',
+                                mode: 'vertical',
+                                scaleID: 'x',
+                                value: code_starting,
+                                borderColor: 'red',
+                                borderWidth: 1,
+                                borderDash: [5, 5],  
+                                label: {
+                                    enabled: false,
+                                },
+                            },
+                            {
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y',
+                                value: under_diameter / 2 ,
+                                borderColor: 'green',
+                                borderWidth: 1,
+                                borderDash: [5, 5],  
+                                label: {
+                                    enabled: false,
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        });
+    }
+
+    // 計算 min 和 max
+    function calculateMinMax() {
+        let min = 1; 
+        let max = 100; 
+
+        return { min, max };
+    }
+
+    // 獲取滑桿和顯示值的元素
+    var slider = document.getElementById("mySlider");
+    var output = document.getElementById("sliderValue");
+
+    // 計算 min 和 max
+    var range = calculateMinMax();
+
+    // 設置滑桿的 min 和 max 值
+    slider.setAttribute("min", range.min);
+    slider.setAttribute("max", range.max);
+
+    // 初始化顯示當前的滑桿值
+    output.innerHTML = slider.value;
+
+    // 當滑桿值改變時更新顯示的值
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+        const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
+        const oil_radius = parseFloat(document.getElementById('oil_radius').value);
+        const center = parseFloat(document.getElementById('center').value);
+        const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
+        const code_starting = parseFloat(document.getElementById('code_starting').value);
+        const tool = parseFloat(document.getElementById('tools_radius').value);
+        const under_diameter = parseFloat(document.getElementById('under_diameter').value);
+
+        //
+        const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2)));  // 設定起始角度
+        const endAngle = Math.atan2((center - center - ball_diameter), 0);  // 設定結束角度
+        const centerX = center;  // 圓心X坐標
+        const centerZ = 0;  // 圓心Z坐標
+        const angleStep = (startAngle - endAngle) / range.max;  // 計算角度步進
+        const angle = startAngle - this.value * angleStep;  // 根據滑桿值計算角度
+
+        // 計算工具位置
+        const tools_X = centerX + (ball_diameter) * Math.sin(angle);  
+        const tools_Y = (ball_diameter) * Math.cos(angle);  
+        const tools_point = [{ x: tools_X, y: tools_Y }];
+
+        // 更新圖表
+        chart.data.datasets[3].data = tools_point; // 更新油溝終點數據集
+        chart.update();
+    }
+
 
         function calculate() {
             const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
