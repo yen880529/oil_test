@@ -6,6 +6,7 @@
     <title>油溝計算</title>
     <link rel="stylesheet" href="ui.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 <body>
     <h1>放射狀油溝計算</h1>
@@ -39,10 +40,111 @@
     </div>
     <div id="test">結果：--</div>
     <div id="draw">圖表：</div>
-    <div style="width: 700px; height: 700px;">
+    <div style="width: 400px; height: 400px;">
         <canvas id="coordinateChart"></canvas>
     </div>
+
     <script>
+        let chart = null;
+
+        function initializeChart() {
+            const ctx = document.getElementById('coordinateChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '球碗',
+                            data: [],
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            lineTension: 0,
+                            showLine: true,
+                            pointRadius: 1,
+                        },
+                        {
+                            label: '油溝',
+                            data: [],
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            lineTension: 0,
+                            showLine: true,
+                            pointRadius: 1,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            min: -100, 
+                            max: 100,
+                            ticks: {
+                                stepSize: 10,
+                            },
+                        },
+                        y: {
+                            type: 'linear',
+                            min: 0, 
+                            max: 100,
+                            ticks: {
+                                stepSize: 10,
+                            },
+                        },
+                    },
+                    aspectRatio: 1,
+                    plugins: {
+                        annotation: {
+                            annotations: [
+                                {
+                                    type: 'line',
+                                    mode: 'horizontal',
+                                    scaleID: 'y',
+                                    value: 0,
+                                    borderColor: 'black',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5],  // 虛線
+                                    label: {
+                                        enabled: false,
+                                    },
+                                },
+                                {
+                                    type: 'line',
+                                    mode: 'vertical',
+                                    scaleID: 'x',
+                                    value: 0,
+                                    borderColor: 'black',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5],  // 虛線
+                                    label: {
+                                        enabled: false,
+                                    },
+                                },
+                                {
+                                    type: 'line',
+                                    mode: 'vertical',
+                                    scaleID: 'x',
+                                    value: 5,
+                                    borderColor: 'red',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5],  // 虛線
+                                    label: {
+                                        enabled: false,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            });
+        }
+
         function calculate() {
             const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
             const oil_radius = parseFloat(document.getElementById('oil_radius').value);
@@ -50,82 +152,75 @@
             const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
             const code_starting = parseFloat(document.getElementById('code_starting').value);
             const tool = parseFloat(document.getElementById('tools_radius').value);
-            
-            if (!isNaN(ball_diameter) && !isNaN(oil_radius) && !isNaN(center) && !isNaN(oil_finish)) {
-                let oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
-                let oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
-                let code_starting_y = Math.sqrt((oil_radius - tool) ** 2 - (oil_center - tool - code_starting) ** 2);
-                let code_finish_z = -(oil_finish + tool);
-                let code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
 
+            if (!isNaN(ball_diameter) && !isNaN(oil_radius) && !isNaN(center) && !isNaN(oil_finish)) {
+                const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
+                const oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
+                const code_starting_y = Math.sqrt((oil_radius - tool) ** 2 - (oil_center - tool - code_starting) ** 2);
+                const code_finish_z = -(oil_finish + tool);
+                const code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
+                
+                // 圓心的位置
+                const centerX = center; // 圓心在圖表中的 X 座標
+                const oil_centerX = oil_center; // 油溝圓心在圖表中的 X 座標
+                const centerY = 0; // 圓心在圖表中的 Y 座
+
+                // 起始角度和終止角度的計算
+                const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2))); // 起始點 (50, 119)
+                const endAngle = Math.atan2((center - center - ball_diameter), 0);    // 終止點 (-69, 0)
+
+                const oil_startAngle = Math.atan2(code_starting - oil_center , (Math.sqrt((oil_radius) ** 2 - (code_starting - oil_center) ** 2))); // 起始點 (50, 119)
+                const oil_endAngle = Math.atan2((oil_center - oil_center - oil_radius), 0);    // 終止點 (-69, 0)
+
+                // 使用 r 來繪製圓弧
+                const arcPoints = [];
+                const oil_arcPoints = [];
+                const numPoints = 100; // 點的數量
+                const angleStep = (startAngle - endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
+                const oil_angleStep = (oil_startAngle - oil_endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
+
+                // 繪製圓弧點
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = startAngle - i * angleStep;  // 逆時針方向，所以減少角度
+                    const arcX = centerX + (ball_diameter) * Math.sin(angle);  // 加上圓心偏移量
+                    const arcZ = (ball_diameter) * Math.cos(angle);  // 加上圓心偏移量
+                    arcPoints.push({ x: arcX, y: arcZ });
+                }
+
+                // 繪製油溝圓弧點
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = oil_startAngle - i * oil_angleStep;  // 逆時針方向，所以減少角度
+                    const arcX = oil_centerX + (oil_radius) * Math.sin(angle);  // 加上圓心偏移量
+                    const arcZ = (oil_radius) * Math.cos(angle);  // 加上圓心偏移量
+                    oil_arcPoints.push({ x: arcX, y: arcZ });
+                }
+
+                chart.data.datasets[0].data = arcPoints; // 更新圓弧計算結果
+                chart.data.datasets[1].data = oil_arcPoints; // 更新油溝圓弧計算結果
+                chart.update();
+
+                // 更新圖表範圍
+                chart.options.scales.x.max = center + 20 ;
+                chart.options.scales.y.max = ball_diameter + 20;
+                chart.options.scales.x.min = (center - ball_diameter - 20);
+                chart.options.scales.y.min = -20;  // 設置範圍最小值，確保圖形正確顯示
+                chart.update();
+                // 顯示結果
                 document.getElementById('test').innerHTML = `
                     結果：<br>
-                    oil_finish_y: ${oil_finish_y.toFixed(2)}<br>
-                    oil_center: ${oil_center.toFixed(2)}<br>
                     程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
                     程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
                 `;
-                drawChart();
+
+                // 更新圖表
+                updateChart(arcPoints, oil_arcPoints);
+                
+
             }
         }
 
-        function drawChart() {
-            const ctx = document.getElementById('coordinateChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: '基準線',
-                        data: [],
-                        pointRadius: 0,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        showLine: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false,
-                                color: (context) => (context.tick.value === 0 ? 'red' : 'rgba(0, 0, 0, 0.1)')
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false,
-                                color: (context) => (context.tick.value === 0 ? 'red' : 'rgba(0, 0, 0, 0.1)')
-                            }
-                        }
-                    },
-                    plugins: {
-                        annotation: {
-                            annotations: {
-                                line1: {
-                                    type: 'line',
-                                    xMin: 0,
-                                    xMax: 0,
-                                    borderColor: 'red',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5]
-                                },
-                                line2: {
-                                    type: 'line',
-                                    yMin: 0,
-                                    yMax: 0,
-                                    borderColor: 'red',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5]
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        // 初始化圖表
+        window.onload = initializeChart;
     </script>
 </body>
 </html>
