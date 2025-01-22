@@ -99,10 +99,10 @@
                     {
                         label: '刀具', 
                         data: [],
-                        backgroundColor: 'rgba(0, 0, 255, 1)', 
-                        borderColor: 'rgba(0, 0, 255, 1)',
+                        backgroundColor: 'rgba(255, 0, 0, 1)', 
+                        borderColor: 'rgba(255, 0, 0, 1)',
                         borderWidth: 2,
-                        pointRadius: 4,  
+                        pointRadius: 6,  
                         pointStyle: 'circle', 
                     }
 
@@ -190,7 +190,7 @@
 
     // 計算 min 和 max
     function calculateMinMax() {
-        let min = 1; 
+        let min = 0; 
         let max = 100; 
 
         return { min, max };
@@ -220,11 +220,12 @@
         const code_starting = parseFloat(document.getElementById('code_starting').value);
         const tool = parseFloat(document.getElementById('tools_radius').value);
         const under_diameter = parseFloat(document.getElementById('under_diameter').value);
-
+        const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
+        const oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
         //
         const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2)));  // 設定起始角度
         const endAngle = Math.atan2((center - center - ball_diameter), 0);  // 設定結束角度
-        const centerX = center;  // 圓心X坐標
+        const centerX = oil_center;  // 圓心X坐標
         const centerZ = 0;  // 圓心Z坐標
         const angleStep = (startAngle - endAngle) / range.max;  // 計算角度步進
         const angle = startAngle - this.value * angleStep;  // 根據滑桿值計算角度
