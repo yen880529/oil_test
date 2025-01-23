@@ -99,10 +99,10 @@
                     {
                         label: '刀具', 
                         data: [],
-                        backgroundColor: 'rgba(255, 0, 0, 1)', 
-                        borderColor: 'rgba(255, 0, 0, 1)',
+                        backgroundColor: '#FF0000',
+                        borderColor: '#FF0000',
                         borderWidth: 2,
-                        pointRadius: 6,  
+                        pointRadius: 10,  
                         pointStyle: 'circle', 
                     }
 
@@ -222,17 +222,18 @@
         const under_diameter = parseFloat(document.getElementById('under_diameter').value);
         const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
         const oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
+        const code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
         //
         const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2)));  // 設定起始角度
-        const endAngle = Math.atan2((center - center - ball_diameter), 0);  // 設定結束角度
+        const endAngle = Math.atan2((center - center - ball_diameter), code_finish_y);  // 設定結束角度
         const centerX = oil_center;  // 圓心X坐標
         const centerZ = 0;  // 圓心Z坐標
         const angleStep = (startAngle - endAngle) / range.max;  // 計算角度步進
         const angle = startAngle - this.value * angleStep;  // 根據滑桿值計算角度
 
         // 計算工具位置
-        const tools_X = centerX + (ball_diameter) * Math.sin(angle);  
-        const tools_Y = (ball_diameter) * Math.cos(angle);  
+        const tools_X = oil_center + (oil_radius - tool) * Math.sin(angle);  
+        const tools_Y = (oil_radius - tool) * Math.cos(angle);  
         const tools_point = [{ x: tools_X, y: tools_Y }];
 
         // 更新圖表
@@ -314,6 +315,7 @@
                     結果：<br>
                     程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
                     程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
+                    oil_finish_y: ${oil_finish_y.toFixed(2)}<br>
                 `;
 
                 // 更新圖表
