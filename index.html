@@ -51,6 +51,9 @@
         <input type="range" id="mySlider" value="50">
         <p>當前值: <span id="sliderValue">50</span></p>
     </div>
+    <div class="button-row">
+        <button id="start">自動</button>
+    </div>
 
     <script>
      let chart = null;
@@ -190,9 +193,8 @@
 
     // 計算 min 和 max
     function calculateMinMax() {
-        let min = 0; 
-        let max = 100; 
-
+        let min = 0;
+        let max = 100;
         return { min, max };
     }
 
@@ -210,9 +212,30 @@
     // 初始化顯示當前的滑桿值
     output.innerHTML = slider.value;
 
+    // 全局變數，避免多次 setInterval()
+    let interval = null;
+
+    document.getElementById("start").addEventListener("click", function() {
+        let slider = document.getElementById("mySlider");  // 確保 ID 正確
+        let max = Number(slider.max); // 確保 max 是數字
+
+        if (interval) {
+            clearInterval(interval); // 避免多次觸發
+        }
+
+        interval = setInterval(() => {
+            if (Number(slider.value) < max) {
+                slider.value = Number(slider.value) + 1;
+                slider.dispatchEvent(new Event("input"));  // 觸發滑桿更新
+            } else {
+                clearInterval(interval);
+            }
+        }, 50);
+    });
     // 當滑桿值改變時更新顯示的值
     slider.oninput = function() {
         output.innerHTML = this.value;
+
         const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
         const oil_radius = parseFloat(document.getElementById('oil_radius').value);
         const center = parseFloat(document.getElementById('center').value);
@@ -220,10 +243,11 @@
         const code_starting = parseFloat(document.getElementById('code_starting').value);
         const tool = parseFloat(document.getElementById('tools_radius').value);
         const under_diameter = parseFloat(document.getElementById('under_diameter').value);
+
         const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
         const oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
         const code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
-        //
+
         const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2)));  // 設定起始角度
         const endAngle = Math.atan2((center - center - ball_diameter), code_finish_y);  // 設定結束角度
         const centerX = oil_center;  // 圓心X坐標
@@ -236,10 +260,12 @@
         const tools_Y = (oil_radius - tool) * Math.cos(angle);  
         const tools_point = [{ x: tools_X, y: tools_Y }];
 
-        // 更新圖表
-        chart.data.datasets[3].data = tools_point; // 更新油溝終點數據集
-        chart.update();
-    }
+        // 更新圖表數據
+        if (chart) {
+            chart.data.datasets[3].data = tools_point; // 更新油溝終點數據集
+            chart.update();
+        }
+    };
 
 
         function calculate() {
