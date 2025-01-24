@@ -9,7 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 <body>
-    <h1>放射狀油溝計算</h1>
+    <p style="height: 100px;"></p>
+    <h1>輔助用放射狀油溝計算</h1>
     <p class="section-title">輸入座標：</p>
     <div class="form-group">
         <label for="ball_diameter">球碗直徑：</label>
@@ -40,7 +41,7 @@
         <input type="number" id="under_diameter" placeholder="20" value="20">
     </div>
     <div class="button-row">
-        <button class="button" onclick="calculate()">計算座標</button>
+        <button class="button" id="reset" onclick="calculate()">計算座標</button>
     </div>
     <div id="test">結果：--</div>
     <div id="draw">圖表：</div>
@@ -48,7 +49,6 @@
     <div style="width: 400px; height: 400px;">
         <canvas id="coordinateChart"></canvas>
     </div>
-    <div class="form-group">
         <input type="range" id="tool_slider" value="0">
         <p>進度%: <span id="sliderValue">0</span></p>
     </div>
@@ -67,7 +67,6 @@
         const code_starting = parseFloat(document.getElementById('code_starting').value) || 0;
         const under_diameter = parseFloat(document.getElementById('under_diameter').value) || 0;
         const tool = parseFloat(document.getElementById('tools_radius').value) || 0;
-
         chart = new Chart(ctx, {
             type: 'scatter',
             data: {
@@ -219,6 +218,14 @@
     // 全局變數，避免多次 setInterval()
     let interval = null;
 
+    document.getElementById("reset").addEventListener("click", function() {
+        let slider = document.getElementById("tool_slider");
+        let min = Number(slider.min); 
+
+        slider.value = min; 
+        slider.dispatchEvent(new Event("input")); 
+    });
+
     document.getElementById("start").addEventListener("click", function() {
         let slider = document.getElementById("tool_slider");  // 確保 ID 正確
         let max = Number(slider.max); // 確保 max 是數字
@@ -280,6 +287,18 @@
             const code_starting = parseFloat(document.getElementById('code_starting').value);
             const tool = parseFloat(document.getElementById('tools_radius').value);
             const under_diameter = parseFloat(document.getElementById('under_diameter').value);
+
+            if (chart) {
+                // 更新 "刀具" 的 pointRadius
+                chart.data.datasets.forEach(dataset => {
+                    if (dataset.label === '刀具') {
+                        dataset.pointRadius = tool * 2;
+                    }
+                });
+
+                // 重新繪製圖表
+                chart.update();
+            }
 
             if (!isNaN(ball_diameter) && !isNaN(oil_radius) && !isNaN(center) && !isNaN(oil_finish)) {
                 const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
@@ -345,7 +364,6 @@
                     結果：<br>
                     程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
                     程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
-                    oil_finish_y: ${oil_finish_y.toFixed(2)}<br>
                 `;
 
                 // 更新圖表
