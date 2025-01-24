@@ -227,8 +227,8 @@
     });
 
     document.getElementById("start").addEventListener("click", function() {
-        let slider = document.getElementById("tool_slider");  // 確保 ID 正確
-        let max = Number(slider.max); // 確保 max 是數字
+        let slider = document.getElementById("tool_slider"); 
+        let max = Number(slider.max);
 
         if (interval) {
             clearInterval(interval); // 避免多次觸發
