@@ -19,6 +19,10 @@ body {
     overflow: auto;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     transition: background-color 0.5s ease-in-out;
+    min-height: 100vh; /* 確保內容能超過螢幕高度 */
+    overflow-y: auto;  /* 允許向下滾動 */
+    box-shadow: none;   /* 減少滾動問題 */
+    -webkit-overflow-scrolling: touch; /* 增強 iOS 瀏覽器的滾動體驗 */
 }
 
 h1 {
