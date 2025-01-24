@@ -40,10 +40,11 @@
         <input type="number" id="under_diameter" placeholder="20" value="20">
     </div>
     <div class="button-row">
-        <button onclick="calculate()">計算座標</button>
+        <button class="button" onclick="calculate()">計算座標</button>
     </div>
     <div id="test">結果：--</div>
     <div id="draw">圖表：</div>
+    </div>
     <div style="width: 400px; height: 400px;">
         <canvas id="coordinateChart"></canvas>
     </div>
@@ -52,7 +53,7 @@
         <p>進度%: <span id="sliderValue">0</span></p>
     </div>
     <div class="button-row">
-        <button id="start">自動</button>
+        <button class="button" id="start">自動</button>
     </div>
     <div style="width: 400px; height: 400px;">
         <canvas id="top_view"></canvas>

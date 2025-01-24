@@ -34,26 +34,32 @@ h1 {
     justify-content: center;
 }
 
-button {
-    padding: 12px;
-    width: 100px;
-    background-color: #007bff;
-    border: 1px solid #007bff;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+.button,
+.button:focus {
+    position: relative;
+    min-width: 200px;
+    border: none;
+    border-radius: 2px;
+    background-position: center;
+    background-color: #2196f3;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.8s;
+    padding: 10px 20px;
+    box-shadow: 0 0 4px #999;
 }
-
-button:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+.button:hover {
+    color: #FFFFFF;
+    background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000%;
 }
-
-button.active {
-    background-color: #28a745;
-    border-color: #28a745;
+.button:active {
+    background-color: #6eb9f7;
+    background-size: 100%;
+    transition: background 0s;
 }
 
 /* 表單區塊 */
