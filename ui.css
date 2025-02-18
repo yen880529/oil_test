@@ -6,9 +6,9 @@
 }
 
 html, body {
-    height: 100%; /* 確保頁面占滿螢幕 */
-    margin: 0; /* 去除預設的 margin */
-    padding: 0; /* 去除預設的 padding */
+    height: 100%;
+    margin: 0;
+    padding: 0;
     overflow-x: hidden; /* 禁止水平滾動 */
 }
 
