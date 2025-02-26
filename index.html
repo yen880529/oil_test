@@ -53,9 +53,25 @@
         <p>進度%: <span id="sliderValue">0</span></p>
     </div>
     <div class="button-row">
-        <button class="button" id="start">自動</button>
+        <button class="button" id="start">模擬</button>
+    </div>
+    <div class="button-row">
+        <button class="button" id="copy" onclick="copyText()">複製座標</button>
+    </div>  
+    <div class="form-group">
+        <textarea id="message" rows="10" cols="50"></textarea>
+    </div>
+  
     <script>
-     let chart = null;
+    let chart = null;
+
+    
+    function copyText() {
+        let textArea = document.getElementById("message");
+        textArea.select();
+        document.execCommand("copy");
+        alert("已複製到剪貼簿！");
+    }
 
     // 初始化圖表
     function initializeChart() {
@@ -108,7 +124,20 @@
                         borderWidth: 2,
                         pointRadius: tool * 2 ,  
                         pointStyle: 'circle', 
+                    },
+
+                    {
+                        label: '刀具路徑', 
+                        data: [],
+                        backgroundColor: '#1b263b',
+                        borderColor: '#1b263b',
+                        borderWidth: 2,
+                        pointRadius: 0.5,  
+                        pointStyle: 'circle', 
                     }
+
+
+
 
                 ],
             },
@@ -256,6 +285,9 @@
         const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
         const oil_center = Math.sqrt(oil_radius ** 2 - oil_finish_y ** 2) - oil_finish;
         const code_finish_y = Math.sqrt((oil_radius - tool) ** 2 - (((oil_finish + 5 - tool)) + oil_center) ** 2);
+        const code_starting_y = Math.sqrt((oil_radius - tool) ** 2 - (oil_center - tool - code_starting) ** 2);
+        const code_r  = Math.sqrt((code_starting_y) ** 2 + (center - code_starting) ** 2);
+
 
         const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2)));  // 設定起始角度
         const endAngle = Math.atan2((center - center - ball_diameter), code_finish_y);  // 設定結束角度
@@ -274,6 +306,35 @@
             chart.data.datasets[3].data = tools_point; // 更新油溝終點數據集
             chart.update();
         }
+
+        const toolPoints = [];
+        const numPoints = range.max; // 點的數量
+
+        // 繪製圓弧點
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = startAngle - i * angleStep;  
+            const tools_X = ((ball_diameter) * Math.sin(angle)+center);  // 加上-tool則是刀具圓中心路徑
+            const tools_Y = (ball_diameter) * Math.cos(angle);  
+            toolPoints.push({ x: tools_X, y: tools_Y });
+        }
+
+        if (chart) {
+            chart.data.datasets[4].data = toolPoints; // 更新整個圓弧
+            chart.update();
+        }
+
+            // **這行要放在 for 迴圈外，避免值被覆蓋**
+        document.getElementById("message").value = toolPoints
+            .map(point => `Y${point.y.toFixed(2)} Z${point.x.toFixed(2)}`)
+            .join("\n");
+        const startAngleDeg = startAngle * (180 / Math.PI);
+
+
+        //document.getElementById('test').innerHTML = `
+        //code_r: ${code_r.toFixed(2)}<br>
+        //code_finish_y: ${code_finish_y.toFixed(2)}<br>
+        //startAngle: ${startAngleDeg.toFixed(2)}<br>
+        // `;
     };
 
 
@@ -312,7 +373,7 @@
 
                 // 起始角度和終止角度的計算
                 const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2))); // 起始點 (50, 119)
-                const endAngle = Math.atan2((center - center - ball_diameter), 0);    // 終止點 (-69, 0)
+                const endAngle = Math.atan2((center - center + code_finish_z), code_finish_y);    // 終止點 (-69, 0)
 
                 const oil_startAngle = Math.atan2(code_starting - oil_center , (Math.sqrt((oil_radius) ** 2 - (code_starting - oil_center) ** 2))); // 起始點 (50, 119)
                 const oil_endAngle = Math.atan2((oil_center - oil_center - oil_radius), 0);    // 終止點 (-69, 0)
@@ -358,11 +419,13 @@
                 chart.options.scales.y.min = -20;  // 設置範圍最小值，確保圖形正確顯示
                 chart.update();
                 // 顯示結果
-                document.getElementById('test').innerHTML = `
-                    結果：<br>
-                    程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
-                    程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
-                `;
+                //document.getElementById('test').innerHTML = `
+                  //  結果：<br>
+                    //程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
+                    //程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
+                    //刀具路徑R: ${(oil_radius - tool).toFixed(2)}<br>
+                //`;
+
 
                 // 更新圖表
                 updateChart(arcPoints, oil_arcPoints, oil_finish_point);
