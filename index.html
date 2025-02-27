@@ -447,12 +447,12 @@
                 chart.options.scales.y.min = -20;  // 設置範圍最小值，確保圖形正確顯示
                 chart.update();
                 // 顯示結果
-                //document.getElementById('test').innerHTML = `
-                  //  結果：<br>
-                    //程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
-                    //程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
-                    //刀具路徑R: ${(oil_radius - tool).toFixed(2)}<br>
-                //`;
+                document.getElementById('test').innerHTML = `
+                    結果：<br>
+                    程式起點: Y ${code_starting_y.toFixed(2)} , Z ${code_starting.toFixed(2)}<br>
+                    程式終點: Y ${code_finish_y.toFixed(2)} , Z ${code_finish_z.toFixed(2)}<br>
+                    刀具路徑R: ${(oil_radius - tool).toFixed(2)}<br>
+                `;
 
 
                 // 更新圖表
