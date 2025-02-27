@@ -92,7 +92,7 @@
                         fill: false,
                         lineTension: 0,
                         showLine: true,
-                        pointRadius: 0.5,
+                        pointRadius: 0.1,
                         pointHitRadius: 0
                     },
                     {
@@ -104,17 +104,17 @@
                         fill: false,
                         lineTension: 0,
                         showLine: true,
-                        pointRadius: 0.5,
+                        pointRadius: 0.1,
                         pointHitRadius: 0
                     },
                     {
-                        label: '油溝終點', 
+                        label: '油溝終點',
                         data: [],
-                        backgroundColor: '#ce4257', 
+                        backgroundColor: '#ce4257',
                         borderColor: '#ce4257',
                         borderWidth: 2,
-                        pointRadius: 4,  
-                        pointStyle: 'circle', 
+                        pointRadius: 4,
+                        pointStyle: 'circle',
                     },
                     {
                         label: '刀具', 
@@ -129,16 +129,21 @@
                     {
                         label: '刀具路徑', 
                         data: [],
-                        backgroundColor: '#1b263b',
-                        borderColor: '#1b263b',
+                        backgroundColor: 'green',
+                        borderColor: 'green',
                         borderWidth: 2,
-                        pointRadius: 0.5,  
+                        pointRadius: 0.1,  
+                        pointStyle: 'circle', 
+                    },
+                    {
+                        label: '刀具範圍', 
+                        data: [],
+                        backgroundColor: 'red',
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        pointRadius: tool * 2,  
                         pointStyle: 'circle', 
                     }
-
-
-
-
                 ],
             },
             options: {
@@ -308,6 +313,7 @@
         }
 
         const toolPoints = [];
+        const toolrange = [];
         const numPoints = range.max; // 點的數量
 
         // 繪製圓弧點
@@ -317,9 +323,19 @@
             const tools_Y = (ball_diameter) * Math.cos(angle);  
             toolPoints.push({ x: tools_X, y: tools_Y });
         }
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = startAngle - i * angleStep;  
+            const range_X = oil_center + (oil_radius - tool) * Math.sin(angle);  // 加上-tool則是刀具圓中心路徑
+            const range_Y = (oil_radius - tool) * Math.cos(angle);  
+            toolrange.push({ x: range_X, y: range_Y });
+        }
+
+
+
 
         if (chart) {
             chart.data.datasets[4].data = toolPoints; // 更新整個圓弧
+            chart.data.datasets[5].data = toolrange; // 更新整個圓弧
             chart.update();
         }
 
@@ -350,7 +366,7 @@
             if (chart) {
                 // 更新 "刀具" 的 pointRadius
                 chart.data.datasets.forEach(dataset => {
-                    if (dataset.label === '刀具') {
+                    if (dataset.label === '刀具' || dataset.label === '刀具範圍') {
                         dataset.pointRadius = tool * 2;
                     }
                 });
@@ -381,25 +397,37 @@
                 // 使用 r 來繪製圓弧
                 const arcPoints = [];
                 const oil_arcPoints = [];
-                const numPoints = 300; // 點的數量
-                const angleStep = (startAngle - endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
+                const numPoints = 30; // 點的數量
+                const angleStep = (startAngle - endAngle) / (numPoints - 2);
                 const oil_angleStep = (oil_startAngle - oil_endAngle) / numPoints;  // 角度步進應該是從 start 到 end，且是逆時針方向
 
                 // 繪製圓弧點
-                for (let i = 0; i <= numPoints; i++) {
+                for (let i = 0; i < numPoints; i++) {
                     const angle = startAngle - i * angleStep;  // 逆時針方向，所以減少角度
                     const arcX = centerX + (ball_diameter) * Math.sin(angle);  // 加上圓心偏移量
                     const arcZ = (ball_diameter) * Math.cos(angle);  // 加上圓心偏移量
                     arcPoints.push({ x: arcX, y: arcZ });
                 }
+                //arcPoints[arcPoints.length - 1] = {
+                //    x: centerX + (ball_diameter) * Math.sin(endAngle),
+                 //   y: (ball_diameter) * Math.cos(endAngle),
+                //};
 
                 // 繪製油溝圓弧點
-                for (let i = 0; i <= numPoints; i++) {
+                for (let i = 0; i < numPoints; i++) {
                     const angle = oil_startAngle - i * oil_angleStep;  // 逆時針方向，所以減少角度
                     const arcX = oil_centerX + (oil_radius) * Math.sin(angle);  // 加上圓心偏移量
                     const arcZ = (oil_radius) * Math.cos(angle);  // 加上圓心偏移量
                     oil_arcPoints.push({ x: arcX, y: arcZ });
                 }
+                //oil_arcPoints[oil_arcPoints.length - 1] = {
+                //    x: oil_centerX + (oil_radius) * Math.sin(oil_endAngle),
+                //    y: (oil_radius) * Math.cos(oil_endAngle),
+                //};
+
+
+
+
                 const oil_finish_point = []; // 確保它是陣列
                 oil_finish_point.push({ x: -oil_finish, y: oil_finish_y });
 
