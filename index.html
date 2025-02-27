@@ -50,7 +50,7 @@
         <canvas id="coordinateChart"></canvas>
     </div>
         <input type="range" id="tool_slider" value="0">
-        <p>進度%: <span id="sliderValue">0</span></p>
+        <p>座標點: <span id="sliderValue">0</span></p>
     </div>
     <div class="button-row">
         <button class="button" id="start">模擬</button>
@@ -224,7 +224,7 @@
     // 計算 min 和 max
     function calculateMinMax() {
         let min = 0;
-        let max = 100;
+        let max = 500;
         return { min, max };
     }
 
@@ -277,9 +277,9 @@
         const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
         const oil_radius = parseFloat(document.getElementById('oil_radius').value);
         const center = parseFloat(document.getElementById('center').value);
-        const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
         const code_starting = parseFloat(document.getElementById('code_starting').value);
         const tool = parseFloat(document.getElementById('tools_radius').value);
+        const oil_finish = parseFloat(document.getElementById('oil_finish').value) + tool + 5  ;
         const under_diameter = parseFloat(document.getElementById('under_diameter').value);
 
         const oil_finish_y = Math.sqrt(ball_diameter ** 2 - (oil_finish + center) ** 2);
@@ -342,9 +342,9 @@
             const ball_diameter = parseFloat(document.getElementById('ball_diameter').value) / 2;
             const oil_radius = parseFloat(document.getElementById('oil_radius').value);
             const center = parseFloat(document.getElementById('center').value);
-            const oil_finish = parseFloat(document.getElementById('oil_finish').value) + 10;
             const code_starting = parseFloat(document.getElementById('code_starting').value);
             const tool = parseFloat(document.getElementById('tools_radius').value);
+            const oil_finish = parseFloat(document.getElementById('oil_finish').value) + tool + 5;
             const under_diameter = parseFloat(document.getElementById('under_diameter').value);
 
             if (chart) {
@@ -373,10 +373,10 @@
 
                 // 起始角度和終止角度的計算
                 const startAngle = Math.atan2(code_starting - center , (Math.sqrt((ball_diameter) ** 2 - (code_starting - center) ** 2))); // 起始點 (50, 119)
-                const endAngle = Math.atan2((center - center + code_finish_z), code_finish_y);    // 終止點 (-69, 0)
+                const endAngle = Math.atan2((center - center + code_finish_z), 0);    // 終止點 (-69, 0)
 
                 const oil_startAngle = Math.atan2(code_starting - oil_center , (Math.sqrt((oil_radius) ** 2 - (code_starting - oil_center) ** 2))); // 起始點 (50, 119)
-                const oil_endAngle = Math.atan2((oil_center - oil_center - oil_radius), 0);    // 終止點 (-69, 0)
+                const oil_endAngle = Math.atan2((oil_center - oil_center - oil_radius), oil_finish_y);    // 終止點 (-69, 0)
 
                 // 使用 r 來繪製圓弧
                 const arcPoints = [];
